@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.actor == 'doctorpangloss' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -72,6 +73,7 @@ jobs:
           path: public
 
   deploy:
+    if: ${{ github.actor == 'doctorpangloss' }}
     needs: build
     runs-on: ubuntu-latest
     environment:
