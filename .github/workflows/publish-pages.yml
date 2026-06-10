@@ -1,0 +1,83 @@
+name: publish-pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      tbfix_tag:
+        description: 'AppMana/thunderbolt-tbfix release tag'
+        required: true
+        default: 'v1.4'
+      ibverbs_tag:
+        description: 'AppMana/forks-thunderbolt-ibverbs release tag; empty skips ibverbs'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends dpkg-dev gnupg
+
+      - name: Import signing key
+        env:
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+          APT_GPG_PASSPHRASE: ${{ secrets.APT_GPG_PASSPHRASE }}
+        run: |
+          test -n "$APT_GPG_PRIVATE_KEY"
+          install -m 0700 -d ~/.gnupg
+          printf '%s\n' "$APT_GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --batch --list-secret-keys --with-colons
+          keyid="$(gpg --batch --list-secret-keys --with-colons | awk -F: '/^sec:/ { print $5; exit }')"
+          test -n "$keyid"
+          echo "APT_SIGNING_KEY=$keyid" >> "$GITHUB_ENV"
+          gpg --batch --yes --armor --export "$keyid" > appmana-archive-keyring.gpg
+
+      - name: Download release debs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TBFIX_TAG: ${{ github.event.inputs.tbfix_tag || 'v1.4' }}
+          IBVERBS_TAG: ${{ github.event.inputs.ibverbs_tag || '' }}
+        run: |
+          scripts/download-release-debs.sh
+
+      - name: Build signed repository
+        env:
+          SIGNING_KEY: ${{ env.APT_SIGNING_KEY }}
+          SIGNING_PASSPHRASE: ${{ secrets.APT_GPG_PASSPHRASE }}
+        run: |
+          scripts/build-apt-repo.sh dist public
+          cp appmana-archive-keyring.gpg public/appmana-archive-keyring.gpg
+          find public -maxdepth 5 -type f | sort
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
