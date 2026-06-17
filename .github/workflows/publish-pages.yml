@@ -3,14 +3,10 @@ name: publish-pages
 on:
   workflow_dispatch:
     inputs:
-      tbfix_tag:
-        description: 'AppMana/thunderbolt-tbfix release tag'
+      release_tag:
+        description: 'AppMana/forks-thunderbolt release tag (drives both tbfix and ibverbs debs)'
         required: true
-        default: 'v1.4'
-      ibverbs_tag:
-        description: 'AppMana/forks-thunderbolt-ibverbs release tag; empty skips ibverbs'
-        required: false
-        default: ''
+        default: 'v1.9'
 
 permissions:
   contents: read
@@ -50,8 +46,8 @@ jobs:
       - name: Download release debs
         env:
           GH_TOKEN: ${{ github.token }}
-          TBFIX_TAG: ${{ github.event.inputs.tbfix_tag || 'v1.4' }}
-          IBVERBS_TAG: ${{ github.event.inputs.ibverbs_tag || '' }}
+          TBFIX_TAG: ${{ github.event.inputs.release_tag || 'v1.9' }}
+          IBVERBS_TAG: ${{ github.event.inputs.release_tag || 'v1.9' }}
         run: |
           scripts/download-release-debs.sh
 

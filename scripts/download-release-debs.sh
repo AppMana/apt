@@ -4,10 +4,11 @@
 set -euo pipefail
 
 out_dir="${OUT_DIR:-dist}"
-tbfix_repo="${TBFIX_REPO:-AppMana/thunderbolt-tbfix}"
-tbfix_tag="${TBFIX_TAG:-v1.4}"
-ibverbs_repo="${IBVERBS_REPO:-AppMana/forks-thunderbolt-ibverbs}"
-ibverbs_tag="${IBVERBS_TAG:-}"
+# tbfix and ibverbs now ship from one unified repo and one release tag.
+tbfix_repo="${TBFIX_REPO:-AppMana/forks-thunderbolt}"
+tbfix_tag="${TBFIX_TAG:-v1.9}"
+ibverbs_repo="${IBVERBS_REPO:-AppMana/forks-thunderbolt}"
+ibverbs_tag="${IBVERBS_TAG:-v1.9}"
 codename="${CODENAME:-noble}"
 
 mkdir -p "$out_dir"
@@ -26,7 +27,7 @@ download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-tbfix-dkms_*.deb.sha256
 
 if [[ -n "$ibverbs_tag" ]]; then
 	download_pattern "$ibverbs_repo" "$ibverbs_tag" 'thunderbolt-ibverbs-dkms_*.deb'
-	download_pattern "$ibverbs_repo" "$ibverbs_tag" "usb4-rdma-provider_*${codename}_amd64.deb"
+	download_pattern "$ibverbs_repo" "$ibverbs_tag" "usb4-rdma-provider_*~${codename}_amd64.deb"
 fi
 
 find "$out_dir" -maxdepth 1 -type f -name '*.deb' -print | sort
