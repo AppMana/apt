@@ -27,7 +27,7 @@ download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-tbfix-dkms_*.deb.sha256
 
 if [[ -n "$ibverbs_tag" ]]; then
 	download_pattern "$ibverbs_repo" "$ibverbs_tag" 'thunderbolt-ibverbs-dkms_*.deb'
-	download_pattern "$ibverbs_repo" "$ibverbs_tag" "usb4-rdma-provider_*~${codename}_amd64.deb"
+	download_pattern "$ibverbs_repo" "$ibverbs_tag" "usb4-rdma-provider_*${codename}_amd64.deb"
 fi
 
 find "$out_dir" -maxdepth 1 -type f -name '*.deb' -print | sort
