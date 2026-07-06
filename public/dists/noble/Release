@@ -1,0 +1,14 @@
+Origin: AppMana
+Label: AppMana
+Suite: noble
+Codename: noble
+Date: Mon, 06 Jul 2026 17:35:38 +0000
+Architectures: amd64
+Components: main
+Description: AppMana package repository
+MD5Sum:
+ 45624522d5369c8004d5525e3e720b02             2590 main/binary-amd64/Packages
+ 6ef392d88d164aa2ee14a04f0ae877b7              984 main/binary-amd64/Packages.gz
+SHA256:
+ 2dd53e94bb2fac9618a71ced6b5df3b47fd72b94d3872a9efdb939d526291ccc             2590 main/binary-amd64/Packages
+ 667f296cc8befe46a91a501619d938ca9b6444df55e37f42cfbc853b57f04d33              984 main/binary-amd64/Packages.gz
