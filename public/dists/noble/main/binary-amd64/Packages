@@ -58,3 +58,22 @@ Description: AppMana Thunderbolt and Thunderbolt-net kernel module fixes
  registers it with DKMS so the modules are rebuilt for the running kernel and
  future kernel upgrades.
 
+Package: thunderbolt-tbfix-dkms
+Version: 2.2
+Architecture: all
+Maintainer: AppMana <ops@appmana.com>
+Depends: dkms (>= 2.1.0.0), kmod, make, libc6
+Filename: pool/main/thunderbolt-tbfix-dkms_2.2_all.deb
+Size: 259248
+MD5sum: 7a8ad3f65c6ed2efca4281f52cc8cefa
+SHA1: eb22eda90e1c017f9ce8fb96eb0502716e46108e
+SHA256: dd837edc96fc47c67e60dc511c752afa9aeb497a398b9f9b3b97e255e193d759
+Section: kernel
+Priority: optional
+Homepage: https://github.com/AppMana/thunderbolt-tbfix
+Description: AppMana Thunderbolt and Thunderbolt-net kernel module fixes
+ DKMS source package for AppMana's patched thunderbolt.ko and
+ thunderbolt_net.ko modules. This package installs source under /usr/src and
+ registers it with DKMS so the modules are rebuilt for the running kernel and
+ future kernel upgrades.
+
