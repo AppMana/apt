@@ -20,6 +20,28 @@ Description: ALPHA Thunderbolt/USB4 host-to-host RDMA verbs kernel module (DKMS 
  This AppMana build is alpha/pre-release software. Requires Linux 6.14 or
  newer, or the linux-thunderbolt kernel built from the upstream flake.
 
+Package: thunderbolt-ibverbs-dkms
+Version: 0.2.24
+Architecture: all
+Maintainer: AppMana <ops@appmana.com>
+Depends: dkms (>= 2.1.0.0), kmod, libc6
+Filename: pool/main/thunderbolt-ibverbs-dkms_0.2.24_all.deb
+Size: 142278
+MD5sum: 19c9562539a5b237cc1a733fca35f836
+SHA1: ab4152b0e45c0fa62d152e01c987abb7b65468e1
+SHA256: 7d5d7866fb854d7e5e0a355fa037460b2807a3766f1f0440b9a4b6fd978e70a2
+Section: kernel
+Priority: optional
+Homepage: https://github.com/AppMana/forks-thunderbolt-ibverbs
+Description: ALPHA Thunderbolt/USB4 host-to-host RDMA verbs kernel module (DKMS source)
+ Experimental Linux kernel module exposing an RDMA verbs device over
+ Thunderbolt/USB4 host-to-host links. This package installs the module source
+ under /usr/src and registers it with DKMS, which builds the module against
+ the running kernel on install and on every subsequent kernel upgrade.
+ .
+ This AppMana build is alpha/pre-release software. Requires Linux 6.14 or
+ newer, or the linux-thunderbolt kernel built from the upstream flake.
+
 Package: thunderbolt-tbfix-dkms
 Version: 1.4
 Architecture: all
@@ -76,4 +98,43 @@ Description: AppMana Thunderbolt and Thunderbolt-net kernel module fixes
  thunderbolt_net.ko modules. This package installs source under /usr/src and
  registers it with DKMS so the modules are rebuilt for the running kernel and
  future kernel upgrades.
+
+Package: thunderbolt-tbfix-dkms
+Version: 2.6
+Architecture: all
+Maintainer: AppMana <ops@appmana.com>
+Depends: dkms (>= 2.1.0.0), kmod, make, libc6
+Filename: pool/main/thunderbolt-tbfix-dkms_2.6_all.deb
+Size: 259448
+MD5sum: 32008651b92389b7e52920e93bb0b642
+SHA1: b3737e18cf3c36dda311d47a916a6bd850219479
+SHA256: 33058198093826eaee024ccccc31120196ac93e05b8af840dbb9983eb4c718bb
+Section: kernel
+Priority: optional
+Homepage: https://github.com/AppMana/thunderbolt-tbfix
+Description: AppMana Thunderbolt and Thunderbolt-net kernel module fixes
+ DKMS source package for AppMana's patched thunderbolt.ko and
+ thunderbolt_net.ko modules. This package installs source under /usr/src and
+ registers it with DKMS so the modules are rebuilt for the running kernel and
+ future kernel upgrades.
+
+Package: usb4-rdma-provider
+Version: 0.2.24~noble
+Architecture: amd64
+Maintainer: AppMana <ops@appmana.com>
+Depends: libibverbs1
+Filename: pool/main/usb4-rdma-provider_0.2.24~noble_amd64.deb
+Size: 25938
+MD5sum: 6e0e057a149bc344ec93c019a5be5f0c
+SHA1: a6fb7e53cf6a224d26a8c2dfb8ae2aa7c2c40e39
+SHA256: 2a564e096b8a1bd5d371a426dd1c894f0cddd17453fed3d9ad2046d6247c8fcb
+Section: libs
+Priority: optional
+Homepage: https://github.com/AppMana/forks-thunderbolt-ibverbs
+Description: ALPHA usb4_rdma libibverbs userspace provider
+ Drop-in libibverbs provider that lets libibverbs enumerate and use
+ thunderbolt_ibverbs kernel devices. Install alongside the matching
+ thunderbolt-ibverbs-dkms package for full ibv_devices visibility and
+ downstream RDMA tool support (NCCL, vllm, perftest). This AppMana build is
+ alpha/pre-release software.
 
