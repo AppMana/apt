@@ -27,6 +27,8 @@ download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-tbfix-dkms_*.deb.sha256
 
 if [[ -n "$ibverbs_tag" ]]; then
 	download_pattern "$ibverbs_repo" "$ibverbs_tag" 'thunderbolt-ibverbs-dkms_*.deb'
+	download_pattern "$ibverbs_repo" "$ibverbs_tag" 'thunderbolt-ibverbs-tools_*.deb' || \
+		printf 'warning: release %s predates thunderbolt-ibverbs-tools\n' "$ibverbs_tag" >&2
 	download_pattern "$ibverbs_repo" "$ibverbs_tag" "usb4-rdma-provider_*${codename}_amd64.deb"
 fi
 
