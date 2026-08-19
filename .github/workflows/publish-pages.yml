@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'AppMana/forks-thunderbolt release tag (drives both tbfix and ibverbs debs)'
+        description: 'AppMana/forks-thunderbolt release tag for the current stack (tbfix, tbrxe, provider)'
         required: true
-        default: 'v1.9'
+        default: 'v2.39'
+      legacy_release_tag:
+        description: 'Release tag pinning the frozen legacy thunderbolt-ibverbs generation'
+        required: true
+        default: 'v2.35'
 
 permissions:
   contents: read
@@ -46,8 +50,8 @@ jobs:
       - name: Download release debs
         env:
           GH_TOKEN: ${{ github.token }}
-          TBFIX_TAG: ${{ github.event.inputs.release_tag || 'v1.9' }}
-          IBVERBS_TAG: ${{ github.event.inputs.release_tag || 'v1.9' }}
+          TBFIX_TAG: ${{ github.event.inputs.release_tag || 'v2.39' }}
+          IBVERBS_TAG: ${{ github.event.inputs.legacy_release_tag || 'v2.35' }}
         run: |
           scripts/download-release-debs.sh
 
