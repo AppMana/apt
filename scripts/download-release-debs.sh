@@ -10,7 +10,7 @@ out_dir="${OUT_DIR:-dist}"
 # that version until every host has migrated to tbrxe -- indexing a newer
 # legacy deb would trigger unplanned fleet driver upgrades).
 tbfix_repo="${TBFIX_REPO:-AppMana/forks-thunderbolt}"
-tbfix_tag="${TBFIX_TAG:-v2.41}"
+tbfix_tag="${TBFIX_TAG:-v2.42}"
 ibverbs_repo="${IBVERBS_REPO:-AppMana/forks-thunderbolt}"
 ibverbs_tag="${IBVERBS_TAG:-v2.35}"
 codename="${CODENAME:-noble}"
@@ -26,11 +26,14 @@ download_pattern() {
 	gh release download "$tag" -R "$repo" -p "$pattern" -D "$out_dir" --clobber
 }
 
-# Current stack: patched core, tbrxe engine, userspace provider.
+# Current stack: patched core, thunderbolt_frame engine (v2.42 rename of
+# tbrxe: deb thunderbolt-frame-dkms, tools deb thunderbolt-frame-tools),
+# userspace provider.
 download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-tbfix-dkms_*.deb'
 download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-tbfix-dkms_*.deb.sha256' || true
-download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-tbrxe-dkms_*.deb'
-download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-tbrxe-dkms_*.deb.sha256' || true
+download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-frame-dkms_*.deb'
+download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-frame-dkms_*.deb.sha256' || true
+download_pattern "$tbfix_repo" "$tbfix_tag" 'thunderbolt-frame-tools_*.deb' || true
 download_pattern "$tbfix_repo" "$tbfix_tag" "usb4-rdma-provider_*${codename}_amd64.deb"
 
 # Legacy generation: frozen thunderbolt-ibverbs plus its matched core and
