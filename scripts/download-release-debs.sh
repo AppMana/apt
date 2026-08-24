@@ -10,7 +10,7 @@ out_dir="${OUT_DIR:-dist}"
 # that version until every host has migrated to tbrxe -- indexing a newer
 # legacy deb would trigger unplanned fleet driver upgrades).
 tbfix_repo="${TBFIX_REPO:-AppMana/forks-thunderbolt}"
-tbfix_tag="${TBFIX_TAG:-v2.42}"
+tbfix_tag="${TBFIX_TAG:-v2.44}"
 ibverbs_repo="${IBVERBS_REPO:-AppMana/forks-thunderbolt}"
 ibverbs_tag="${IBVERBS_TAG:-v2.35}"
 codename="${CODENAME:-noble}"
