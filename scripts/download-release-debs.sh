@@ -47,4 +47,9 @@ if [[ -n "$ibverbs_tag" ]]; then
 	download_pattern "$ibverbs_repo" "$ibverbs_tag" 'thunderbolt-tbfix-dkms_*.deb.sha256' || true
 fi
 
+if [[ "$codename" == noble ]]; then
+	download_pattern AppMana/forks-usbmuxd-ios appmana-noble-1 'usbmuxd_1.1.1-5~exp3ubuntu2.1+appmana2_amd64.deb'
+	download_pattern AppMana/ios-safari-debug-stack apt-noble-0.2.2 'ios-safari-debug-stack_0.2.2_amd64.deb'
+fi
+
 find "$out_dir" -maxdepth 1 -type f -name '*.deb' -print | sort
