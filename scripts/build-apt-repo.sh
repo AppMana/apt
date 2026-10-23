@@ -9,7 +9,8 @@ Usage:
   scripts/build-apt-repo.sh <deb-dir> <public-dir>
 
 Environment:
-  CODENAME      Apt codename. Default: noble.
+  CODENAME      Apt codename (when CODENAMES is unset). Default: noble.
+  CODENAMES     Space-separated list of apt codenames to index. Default: "noble resolute".
   COMPONENT     Apt component. Default: main.
   ORIGIN        Release Origin. Default: AppMana.
   LABEL         Release Label. Default: AppMana.
@@ -28,7 +29,11 @@ public_dir="${2:-}"
 [[ -n "$deb_dir" && -n "$public_dir" ]] || { usage >&2; exit 1; }
 [[ -d "$deb_dir" ]] || { printf 'error: deb dir not found: %s\n' "$deb_dir" >&2; exit 1; }
 
-codename="${CODENAME:-noble}"
+if [[ -n "${CODENAME:-}" ]]; then
+	codenames="${CODENAMES:-$CODENAME}"
+else
+	codenames="${CODENAMES:-noble resolute}"
+fi
 component="${COMPONENT:-main}"
 origin="${ORIGIN:-AppMana}"
 label="${LABEL:-AppMana}"
@@ -40,9 +45,7 @@ command -v dpkg-scanpackages >/dev/null 2>&1 || {
 }
 
 rm -rf "$public_dir"
-install -d -m 0755 \
-	"$public_dir/pool/$component" \
-	"$public_dir/dists/$codename/$component/binary-$arch"
+install -d -m 0755 "$public_dir/pool/$component"
 
 find "$deb_dir" -maxdepth 1 -type f -name '*.deb' -print0 |
 	while IFS= read -r -d '' deb; do
@@ -54,48 +57,51 @@ if ! find "$public_dir/pool/$component" -type f -name '*.deb' | grep -q .; then
 	exit 1
 fi
 
-(
-	cd "$public_dir"
-	dpkg-scanpackages -m "pool/$component" /dev/null \
-		> "dists/$codename/$component/binary-$arch/Packages"
-	gzip -9cn "dists/$codename/$component/binary-$arch/Packages" \
-		> "dists/$codename/$component/binary-$arch/Packages.gz"
-)
-
-release="$public_dir/dists/$codename/Release"
-{
-	printf 'Origin: %s\n' "$origin"
-	printf 'Label: %s\n' "$label"
-	printf 'Suite: %s\n' "$codename"
-	printf 'Codename: %s\n' "$codename"
-	printf 'Date: %s\n' "$(date -Ru)"
-	printf 'Architectures: %s\n' "$arch"
-	printf 'Components: %s\n' "$component"
-	printf 'Description: AppMana package repository\n'
-	printf 'MD5Sum:\n'
+for codename in $codenames; do
+	install -d -m 0755 "$public_dir/dists/$codename/$component/binary-$arch"
 	(
-		cd "$public_dir/dists/$codename"
-		find "$component" -type f | sort | while read -r file; do
-			printf ' %s %16d %s\n' "$(md5sum "$file" | awk '{print $1}')" "$(stat -c '%s' "$file")" "$file"
-		done
+		cd "$public_dir"
+		dpkg-scanpackages -m "pool/$component" /dev/null \
+			> "dists/$codename/$component/binary-$arch/Packages"
+		gzip -9cn "dists/$codename/$component/binary-$arch/Packages" \
+			> "dists/$codename/$component/binary-$arch/Packages.gz"
 	)
-	printf 'SHA256:\n'
-	(
-		cd "$public_dir/dists/$codename"
-		find "$component" -type f | sort | while read -r file; do
-			printf ' %s %16d %s\n' "$(sha256sum "$file" | awk '{print $1}')" "$(stat -c '%s' "$file")" "$file"
-		done
-	)
-} > "$release"
 
-if [[ -n "${SIGNING_KEY:-}" ]]; then
-	gpg_args=(--batch --yes --local-user "$SIGNING_KEY")
-	if [[ -n "${SIGNING_PASSPHRASE:-}" ]]; then
-		gpg_args+=(--pinentry-mode loopback --passphrase "$SIGNING_PASSPHRASE")
+	release="$public_dir/dists/$codename/Release"
+	{
+		printf 'Origin: %s\n' "$origin"
+		printf 'Label: %s\n' "$label"
+		printf 'Suite: %s\n' "$codename"
+		printf 'Codename: %s\n' "$codename"
+		printf 'Date: %s\n' "$(date -Ru)"
+		printf 'Architectures: %s\n' "$arch"
+		printf 'Components: %s\n' "$component"
+		printf 'Description: AppMana package repository (%s)\n' "$codename"
+		printf 'MD5Sum:\n'
+		(
+			cd "$public_dir/dists/$codename"
+			find "$component" -type f | sort | while read -r file; do
+				printf ' %s %16d %s\n' "$(md5sum "$file" | awk '{print $1}')" "$(stat -c '%s' "$file")" "$file"
+			done
+		)
+		printf 'SHA256:\n'
+		(
+			cd "$public_dir/dists/$codename"
+			find "$component" -type f | sort | while read -r file; do
+				printf ' %s %16d %s\n' "$(sha256sum "$file" | awk '{print $1}')" "$(stat -c '%s' "$file")" "$file"
+			done
+		)
+	} > "$release"
+
+	if [[ -n "${SIGNING_KEY:-}" ]]; then
+		gpg_args=(--batch --yes --local-user "$SIGNING_KEY")
+		if [[ -n "${SIGNING_PASSPHRASE:-}" ]]; then
+			gpg_args+=(--pinentry-mode loopback --passphrase "$SIGNING_PASSPHRASE")
+		fi
+		gpg "${gpg_args[@]}" --detach-sign --armor -o "$release.gpg" "$release"
+		gpg "${gpg_args[@]}" --clearsign -o "$public_dir/dists/$codename/InRelease" "$release"
 	fi
-	gpg "${gpg_args[@]}" --detach-sign --armor -o "$release.gpg" "$release"
-	gpg "${gpg_args[@]}" --clearsign -o "$public_dir/dists/$codename/InRelease" "$release"
-fi
+done
 
 cat > "$public_dir/index.html" <<EOF
 <!doctype html>
@@ -103,10 +109,11 @@ cat > "$public_dir/index.html" <<EOF
 <head><meta charset="utf-8"><title>AppMana Apt Repository</title></head>
 <body>
 <h1>AppMana Apt Repository</h1>
-<pre>deb [arch=amd64 signed-by=/usr/share/keyrings/appmana-archive-keyring.gpg] https://appmana.github.io/apt $codename $component</pre>
+<pre>deb [arch=amd64 signed-by=/usr/share/keyrings/appmana-archive-keyring.gpg] https://appmana.github.io/apt noble $component
+deb [arch=amd64 signed-by=/usr/share/keyrings/appmana-archive-keyring.gpg] https://appmana.github.io/apt resolute $component</pre>
 <p>Packages are under <a href="pool/$component/">pool/$component/</a>.</p>
 </body>
 </html>
 EOF
 
-printf 'Built apt repository at %s\n' "$public_dir"
+printf 'Built apt repository at %s (suites: %s)\n' "$public_dir" "$codenames"

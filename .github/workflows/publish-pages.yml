@@ -1,16 +1,22 @@
 name: publish-pages
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       release_tag:
         description: 'AppMana/forks-thunderbolt release tag for the current stack (tbfix, tbrxe, provider)'
         required: true
-        default: 'v3.15'
+        default: 'v3.32'
       legacy_release_tag:
         description: 'Release tag pinning the frozen legacy thunderbolt-ibverbs generation'
         required: true
         default: 'v2.35'
+      gpu_unlock_tag:
+        description: 'AppMana/forks-fp32-bf16-speed-sm80 release tag for gpu-unlock-dkms and gpu-unlock-firmware'
+        required: true
+        default: 'v1.0.0'
 
 permissions:
   contents: read
@@ -50,13 +56,15 @@ jobs:
       - name: Download release debs
         env:
           GH_TOKEN: ${{ github.token }}
-          TBFIX_TAG: ${{ github.event.inputs.release_tag || 'v3.15' }}
+          TBFIX_TAG: ${{ github.event.inputs.release_tag || 'v3.32' }}
           IBVERBS_TAG: ${{ github.event.inputs.legacy_release_tag || 'v2.35' }}
+          GPU_UNLOCK_TAG: ${{ github.event.inputs.gpu_unlock_tag || 'v1.0.0' }}
         run: |
           scripts/download-release-debs.sh
 
-      - name: Build signed repository
+      - name: Build signed repository (noble & resolute)
         env:
+          CODENAMES: 'noble resolute'
           SIGNING_KEY: ${{ env.APT_SIGNING_KEY }}
           SIGNING_PASSPHRASE: ${{ secrets.APT_GPG_PASSPHRASE }}
         run: |

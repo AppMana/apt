@@ -14,10 +14,18 @@ Install:
 curl -fsSL https://appmana.github.io/apt/appmana-archive-keyring.gpg \
   | sudo gpg --dearmor -o /usr/share/keyrings/appmana-archive-keyring.gpg
 
-echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/appmana-archive-keyring.gpg] https://appmana.github.io/apt noble main' \
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/appmana-archive-keyring.gpg] https://appmana.github.io/apt $(. /etc/os-release && echo "${VERSION_CODENAME:-noble}") main" \
   | sudo tee /etc/apt/sources.list.d/appmana.list
 
 sudo apt update
+```
+
+Supported Ubuntu suites: `noble` (Ubuntu 24.04) and `resolute` (Ubuntu 26.04).
+
+GPU unlock packages (`GeForce RTX 3090` / `GA102` / `GA104` BF16 & FP32 Tensor Core unlock):
+
+```bash
+sudo apt install gpu-unlock-dkms gpu-unlock-firmware
 ```
 
 Thunderbolt packages (current tbrxe stack):

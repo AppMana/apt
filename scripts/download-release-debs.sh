@@ -10,9 +10,11 @@ out_dir="${OUT_DIR:-dist}"
 # that version until every host has migrated to tbrxe -- indexing a newer
 # legacy deb would trigger unplanned fleet driver upgrades).
 tbfix_repo="${TBFIX_REPO:-AppMana/forks-thunderbolt}"
-tbfix_tag="${TBFIX_TAG:-v3.15}"
+tbfix_tag="${TBFIX_TAG:-v3.32}"
 ibverbs_repo="${IBVERBS_REPO:-AppMana/forks-thunderbolt}"
 ibverbs_tag="${IBVERBS_TAG:-v2.35}"
+gpu_unlock_repo="${GPU_UNLOCK_REPO:-AppMana/forks-fp32-bf16-speed-sm80}"
+gpu_unlock_tag="${GPU_UNLOCK_TAG:-v1.0.0}"
 codename="${CODENAME:-noble}"
 
 mkdir -p "$out_dir"
@@ -45,6 +47,13 @@ if [[ -n "$ibverbs_tag" ]]; then
 	download_pattern "$ibverbs_repo" "$ibverbs_tag" "usb4-rdma-provider_*${codename}_amd64.deb"
 	download_pattern "$ibverbs_repo" "$ibverbs_tag" 'thunderbolt-tbfix-dkms_*.deb'
 	download_pattern "$ibverbs_repo" "$ibverbs_tag" 'thunderbolt-tbfix-dkms_*.deb.sha256' || true
+fi
+
+if [[ -n "$gpu_unlock_tag" ]]; then
+	download_pattern "$gpu_unlock_repo" "$gpu_unlock_tag" 'gpu-unlock-dkms_*.deb'
+	download_pattern "$gpu_unlock_repo" "$gpu_unlock_tag" 'gpu-unlock-dkms_*.deb.sha256' || true
+	download_pattern "$gpu_unlock_repo" "$gpu_unlock_tag" 'gpu-unlock-firmware_*.deb'
+	download_pattern "$gpu_unlock_repo" "$gpu_unlock_tag" 'gpu-unlock-firmware_*.deb.sha256' || true
 fi
 
 if [[ "$codename" == noble ]]; then
