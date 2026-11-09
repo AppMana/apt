@@ -58,7 +58,7 @@ fi
 
 if [[ "$codename" == noble ]]; then
 	download_pattern AppMana/forks-usbmuxd-ios appmana-noble-2 'usbmuxd_*_amd64.deb'
-	download_pattern AppMana/ios-safari-debug-stack apt-noble-0.2.3 'ios-safari-debug-stack_0.2.3_amd64.deb'
+	download_pattern AppMana/ios-safari-debug-stack apt-noble-0.2.4 'ios-safari-debug-stack_0.2.4_amd64.deb'
 fi
 
 find "$out_dir" -maxdepth 1 -type f -name '*.deb' -print | sort
